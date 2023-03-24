@@ -68,3 +68,9 @@ For a full list of which services and features are covered, please see our [impl
 The full documentation can be found here:
 
 [http://docs.getmoto.org/en/latest/](http://docs.getmoto.org/en/latest/)
+
+
+### Fork Feature
+In the original Moto cognitoidentity's method get_id() creates new identifiers on the fly. Each time it's requested the library generates a
+new one. In cases when identity_id is used to associate it with the user this behavior makes it impossible to test. This version of library generates identifiers based on user's data and provides the same value each time the user requests it.
+
