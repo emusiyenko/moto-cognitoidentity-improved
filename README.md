@@ -14,7 +14,7 @@
 ## Install
 
 ```console
-$ pip install 'moto[ec2,s3,all]'
+$ pip install moto-improved-cognitoidentity
 ```
 
 ## In a nutshell
