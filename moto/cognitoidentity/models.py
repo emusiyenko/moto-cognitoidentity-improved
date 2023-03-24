@@ -8,7 +8,7 @@ from moto.core import BaseBackend, BackendDict, BaseModel
 from moto.core.utils import iso_8601_datetime_with_milliseconds
 from .exceptions import InvalidNameException, ResourceNotFoundError
 from .utils import get_random_identity_id
-
+from jose import jwt
 
 class CognitoIdentityPool(BaseModel):
     def __init__(self, region: str, identity_pool_name: str, **kwargs: Any):
@@ -130,9 +130,19 @@ class CognitoIdentityBackend(BaseBackend):
 
         return pool.to_json()
 
-    def get_id(self, identity_pool_id: str) -> str:
-        identity_id = {"IdentityId": get_random_identity_id(self.region_name)}
-        self.pools_identities[identity_pool_id]["Identities"].append(identity_id)
+    def get_id(self, identity_pool_id: str, logins: dict) -> str:
+        if not logins:
+            identity_id = {"IdentityId": get_random_identity_id(self.region_name)}
+        else:
+            user_pool_id = sorted(list(logins.keys()))[0]
+            user_token = logins[user_pool_id]
+            try:
+                claims = jwt.get_unverified_claims(user_token)
+                identity_id = {"IdentityId": f"{self.region_name}:{claims['sub']}"}
+            except Exception:
+                identity_id = {"IdentityId": f"{self.region_name}:{user_token}"}
+        if identity_id not in self.pools_identities[identity_pool_id]["Identities"]:
+            self.pools_identities[identity_pool_id]["Identities"].append(identity_id)
         return json.dumps(identity_id)
 
     def get_credentials_for_identity(self, identity_id: str) -> str:

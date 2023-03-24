@@ -58,7 +58,8 @@ class CognitoIdentityResponse(BaseResponse):
         )
 
     def get_id(self) -> str:
-        return self.backend.get_id(identity_pool_id=self._get_param("IdentityPoolId"))
+        return self.backend.get_id(identity_pool_id=self._get_param("IdentityPoolId"),
+                                   logins=self._get_param("Logins"))
 
     def describe_identity_pool(self) -> str:
         return self.backend.describe_identity_pool(self._get_param("IdentityPoolId"))
